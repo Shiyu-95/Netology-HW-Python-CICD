@@ -21,4 +21,4 @@ jobs:
 
       - name: Линтер # для линтера используется библиотека, которая указана в requirements и название проекта
         # В exclude указываются файлы, которые не надо проверять, а в ignore те правила пеп8, которые нужно проигнорировать
-        run: flake8 webpython --exclude migrations --ignore E501, F401
+        run: flake8 webpython --exclude migrations --ignore E501
