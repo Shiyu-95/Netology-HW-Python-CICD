@@ -1,0 +1,24 @@
+name: CI/CD action
+
+on:
+  push:
+    branches: [main] # указываем ветки, после деплоя в которые сработает запуск
+
+jobs:
+  testing: # название джобы, может быть любым
+    runs-on: ubuntu-latest #на какой операционке будет запущено
+    steps: # шаги
+      - name: Проверить изменения
+        uses: actions/checkout@v2 # готовая библиотека для этого щага
+
+      - name: Установка Python
+        uses: actions/setup-python@v5 # тоже готовая библиотека
+        with: # указываем конкретную версию питона
+          python-version: 3.12
+
+      - name: Установка зависимостей
+        run: pip install -r requirements.txt
+
+      - name: Линтер # для линтера используется библиотека, которая указана в requirements и название проекта
+        # В exclude указываются файлы, которые не надо проверять, а в ignore те правила пеп8, которые нужно проигнорировать
+        run: flake8 webpython --exclude migrations --ignore E501, F401
