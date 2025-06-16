@@ -7,6 +7,26 @@ on:
 jobs:
   testing: # название джобы, может быть любым
     runs-on: ubuntu-latest #на какой операционке будет запущено
+    env: # переменные окружения, те, что в скобках, будут браться из сикретов в гитхаб сикретс
+      PG_NAME: ${{secrets.PG_NAME}}
+      PG_USER: ${{secrets.PG_USER}}
+      PG_PASSWORD: ${{secrets.PG_PASSWORD}}
+      PG_HOST: ${{secrets.PG_HOST}}
+      PG_PORT: ${{secrets.PG_PORT}}
+    services:
+      postgres_main:
+        image: postgres:latest # версия самого постгреса
+        env: # и его переменные окружения
+          PG_USERS: ${{env.PG_USER}}
+          PG_PASSWORD: ${{env.PG_PASSWORD}}
+          PG_DB: ${{env.PG_NAME}}
+        ports:
+          - 5432:5432
+        options: # проверка подключена и поднялась ли БД
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
     steps: # шаги
       - name: Проверить изменения
         uses: actions/checkout@v2 # готовая библиотека для этого щага
@@ -22,3 +42,12 @@ jobs:
       - name: Линтер # для линтера используется библиотека, которая указана в requirements и название проекта
         # В exclude указываются файлы, которые не надо проверять, а в ignore те правила пеп8, которые нужно проигнорировать
         run: flake8 webpython --exclude migrations --ignore E501
+
+      - name: Тесты
+        run: python webpython/manage.py test
+        env:
+          PG_NAME: ${{secrets.PG_NAME}}
+          PG_USER: ${{secrets.PG_USER}}
+          PG_PASSWORD: ${{secrets.PG_PASSWORD}}
+          PG_HOST: ${{secrets.PG_HOST}}
+          PG_PORT: ${{secrets.PG_PORT}}
